@@ -32,35 +32,34 @@ export default function Home({ navigation }) {
 
   const fetchProfilePicture = async (cin) => {
     const profileImagePath = `Agriculteur_PP/${cin}.png`;
-    const defaultImagePath = 'Agriculteur_PP/Defaultpp.png'; // Path to the default image in Supabase storage
-
+    const defaultImagePath = 'Agriculteur_PP/Default.png'; // Correct path to the default image
+  
     try {
       let { data, error } = await supabase
         .storage
         .from('LocAgri')
         .getPublicUrl(profileImagePath);
-
+  
       if (error || !data.publicUrl) {
-        console.log('Profile picture not found, fetching default image.');
+        // Fetch the default image if the specific image is not found
         ({ data, error } = await supabase
           .storage
           .from('LocAgri')
           .getPublicUrl(defaultImagePath));
-
+  
         if (error || !data.publicUrl) {
           console.error('Error fetching default image:', error);
-          return 'https://via.placeholder.com/100'; // Return placeholder URL if default image fails
-        } else {
-          return data.publicUrl;
+          return 'https://via.placeholder.com/100'; // Return a placeholder URL if default image fails
         }
-      } else {
-        return data.publicUrl;
       }
+  
+      return data.publicUrl;
     } catch (error) {
       console.error('Error fetching image:', error);
       return 'https://via.placeholder.com/100'; // Return placeholder URL if any error occurs
     }
   };
+  
 
   const fetchData = async () => {
     try {
@@ -80,7 +79,7 @@ export default function Home({ navigation }) {
         const sortedData = agriculteursWithImages.sort((a, b) => a.Nom.localeCompare(b.Nom));
         setAgriculteurs(sortedData);
         setFilteredAgriculteurs(sortedData);
-             }
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -91,7 +90,6 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     fetchData();
-    
   }, []);
 
   useEffect(() => {

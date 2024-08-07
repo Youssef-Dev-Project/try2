@@ -12,7 +12,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
         // Static icons for each tab
         let iconName;
         if (route.name === 'Home') {
-          iconName = state.index === index ? 'home' : 'home-outline';
+          iconName = state.index === index ? 'accessibility' : 'accessibility-outline';
         } else if (route.name === 'Maps') {
           iconName = state.index === index ? 'map' : 'map-outline';
         }
