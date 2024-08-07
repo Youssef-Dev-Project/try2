@@ -12,7 +12,7 @@ const Detail = ({ route }) => {
 
   const fetchProfilePicture = async (cin) => {
     const profileImagePath = `Agriculteur_PP/${cin}.png`;
-    const defaultImagePath = 'Agriculteur_PP/Defaultpp.png'; // Path to the default image in Supabase storage
+    const defaultImagePath = 'Agriculteur_PP/Default.png'; // Path to the default image in Supabase storage
 
     try {
       let { data, error } = await supabase
@@ -29,7 +29,7 @@ const Detail = ({ route }) => {
 
         if (error || !data.publicUrl) {
           console.error('Error fetching default image:', error);
-          setProfileImageUri(null); 
+          setProfileImageUri(null);
         } else {
           setProfileImageUri(data.publicUrl);
         }
@@ -47,13 +47,13 @@ const Detail = ({ route }) => {
 
         if (error || !data.publicUrl) {
           console.error('Error fetching default image:', error);
-          setProfileImageUri(null); 
+          setProfileImageUri(null);
         } else {
           setProfileImageUri(data.publicUrl);
         }
       } catch (error) {
         console.error('Error fetching default image:', error);
-        setProfileImageUri(null); 
+        setProfileImageUri(null);
       }
     }
   };
@@ -64,20 +64,20 @@ const Detail = ({ route }) => {
     console.log('Created At:', agriculteur.created_at); // Log created_at
   }, [agriculteur.CIN_ID, agriculteur.DateNaissance, agriculteur.created_at]);
 
-  const imageSource = profileImageUri 
-    ? { uri: profileImageUri } 
+  const imageSource = profileImageUri
+    ? { uri: profileImageUri }
     : { uri: 'https://whpyyzpfmysuwipdcypn.supabase.co/storage/v1/object/public/LocAgri/Agriculteur_PP/Default.png' };
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Invalid date';
-    
+
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'Invalid date'; // Check for invalid dates
-    
+
     const day = String(date.getUTCDate()).padStart(2, '0');
     const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-indexed
     const year = date.getUTCFullYear();
-    
+
     return `${day}/${month}/${year}`;
   };
 
@@ -85,9 +85,9 @@ const Detail = ({ route }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.detail}>
         <View style={{ alignItems: 'center' }}>
-          <Image 
-            source={imageSource} 
-            style={styles.profileImage} 
+          <Image
+            source={imageSource}
+            style={styles.profileImage}
             resizeMode="cover"
             onError={() => setProfileImageUri("https://whpyyzpfmysuwipdcypn.supabase.co/storage/v1/object/public/LocAgri/Agriculteur_PP/Default.png")}
           />
@@ -110,9 +110,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: "#e8f5e9",
   },
   detail: {
-    marginBottom: 20,
+    flex: 1,
+    alignItems: 'center',
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    backgroundColor: "#a5d6a7",
+    borderRadius: 10,
+    marginBottom: 15,
+    marginHorizontal: 5,
+    elevation: 3,
   },
   title: {
     fontSize: 24,
@@ -127,7 +137,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     marginBottom: 10,
-    borderRadius: 75, 
+    borderRadius: 75,
   },
 });
 

@@ -1,3 +1,4 @@
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,19 +10,18 @@ import {
   TouchableWithoutFeedback,
   FlatList,
   Image,
-} from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
-import supabase from "../supabaseClient";
-import { useAuthentication } from "../hooks/useAuthentication";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+} from 'react-native';
+import supabase from '../supabaseClient';
+import { useAuthentication } from '../hooks/useAuthentication';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function Home({ navigation }) {
   const { isAuthenticated, logout } = useAuthentication();
   const [agriculteurs, setAgriculteurs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [filteredAgriculteurs, setFilteredAgriculteurs] = useState([]);
   const [columns] = useState(2);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
@@ -32,43 +32,42 @@ export default function Home({ navigation }) {
 
   const fetchProfilePicture = async (cin) => {
     const profileImagePath = `Agriculteur_PP/${cin}.png`;
-    const defaultImagePath = 'Agriculteur_PP/Default.png'; // Correct path to the default image
-  
+    const defaultImagePath = 'Agriculteur_PP/Default.png'; // Correct path to default image
+
     try {
       let { data, error } = await supabase
         .storage
         .from('LocAgri')
         .getPublicUrl(profileImagePath);
-  
+
       if (error || !data.publicUrl) {
-        // Fetch the default image if the specific image is not found
+        console.log(`Profile image not found for ${cin}, fetching default image.`);
         ({ data, error } = await supabase
           .storage
           .from('LocAgri')
           .getPublicUrl(defaultImagePath));
-  
+
         if (error || !data.publicUrl) {
           console.error('Error fetching default image:', error);
           return 'https://via.placeholder.com/100'; // Return a placeholder URL if default image fails
         }
       }
-  
+
       return data.publicUrl;
     } catch (error) {
       console.error('Error fetching image:', error);
       return 'https://via.placeholder.com/100'; // Return placeholder URL if any error occurs
     }
   };
-  
 
   const fetchData = async () => {
     try {
       const { data, error } = await supabase
-        .from("Agriculteur")
-        .select("CIN_ID, Nom, Prenom, Sexe, DateNaissance, created_at");
+        .from('Agriculteur')
+        .select('CIN_ID, Nom, Prenom, Sexe, DateNaissance, created_at');
 
       if (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       } else {
         const agriculteursWithImages = await Promise.all(data.map(async (agriculteur) => {
           const imageUrl = await fetchProfilePicture(agriculteur.CIN_ID);
@@ -81,7 +80,7 @@ export default function Home({ navigation }) {
         setFilteredAgriculteurs(sortedData);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -113,7 +112,7 @@ export default function Home({ navigation }) {
   const renderItem = ({ item }) => (
     <Pressable
       style={styles.item}
-      onPress={() => navigation.navigate("Detail", { agriculteur: item })}
+      onPress={() => navigation.navigate('Detail', { agriculteur: item })}
     >
       <Image 
         source={{ uri: item.imageUrl }} 
@@ -125,13 +124,6 @@ export default function Home({ navigation }) {
     </Pressable>
   );
 
-  const toggleSearchVisibility = () => {
-    setIsSearchVisible(prevState => !prevState);
-    if (isSearchVisible) {
-      setSearchQuery("");
-    }
-  };
-
   return (
     <View style={styles.view}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -141,8 +133,8 @@ export default function Home({ navigation }) {
               <AntDesign name="logout" size={25} color="white" />
             </Pressable>
             <Text style={styles.title}>Home</Text>
-            <Pressable onPress={toggleSearchVisibility} style={styles.searchToggleButton}>
-              <MaterialIcons name={isSearchVisible ? "close" : "search"} size={24} color="white" />
+            <Pressable onPress={() => setIsSearchVisible(!isSearchVisible)} style={styles.searchToggleButton}>
+              <MaterialIcons name={isSearchVisible ? 'close' : 'search'} size={24} color="white" />
             </Pressable>
           </View>
           <View style={styles.listContainerWrapper}>
@@ -217,11 +209,13 @@ const styles = StyleSheet.create({
     padding: 10,
     position: "absolute",
     left: 10,
+    zIndex: 1, // Ensure the button is on top
   },
   searchToggleButton: {
     padding: 10,
     position: "absolute",
     right: 10,
+    zIndex: 1, // Ensure the button is on top
   },
   searchContainer: {
     flexDirection: 'row',

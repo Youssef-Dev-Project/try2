@@ -8,9 +8,26 @@ export default function Auth() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emptyFields, setEmptyFields] = useState([]);
+  const [localMessage, setLocalMessage] = useState('');
   const navigation = useNavigation();
 
   const handleLogin = () => {
+    // Reset error states
+    setEmptyFields([]);
+    setLocalMessage('');
+
+    // Check if fields are empty
+    const emptyFields = [];
+    if (!email) emptyFields.push('email');
+    if (!password) emptyFields.push('password');
+
+    if (emptyFields.length > 0) {
+      setEmptyFields(emptyFields);
+      setLocalMessage('All fields are required');
+      return;
+    }
+
     login(email, password, navigation);
   };
 
@@ -40,23 +57,40 @@ export default function Auth() {
 
       <Text style={styles.title}>Login</Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          emptyFields.includes('email') && styles.inputError,
+        ]}
         placeholder="Email"
         placeholderTextColor="#a5d6a7" // Light green placeholder text
         value={email}
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={(text) => {
+          setEmail(text);
+          if (text) {
+            setEmptyFields((fields) => fields.filter((field) => field !== 'email'));
+          }
+        }}
       />
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          emptyFields.includes('password') && styles.inputError,
+        ]}
         placeholder="Password"
         placeholderTextColor="#a5d6a7" // Light green placeholder text
         value={password}
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={(text) => {
+          setPassword(text);
+          if (text) {
+            setEmptyFields((fields) => fields.filter((field) => field !== 'password'));
+          }
+        }}
         secureTextEntry
       />
       <Pressable style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable>
+      {localMessage ? <Text style={styles.errorMessage}>{localMessage}</Text> : null}
       {message ? <Text style={styles.errorMessage}>{message}</Text> : null}
       <Text style={styles.message}>Don't have an account?</Text>
       <Pressable style={styles.button} onPress={() => navigation.navigate('Register')}>
@@ -165,6 +199,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     backgroundColor: '#fff', // White background for inputs
+  },
+  inputError: {
+    borderColor: '#d32f2f', // Red border color for error
   },
   button: {
     backgroundColor: '#388e3c', // Dark green background
