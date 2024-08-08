@@ -11,7 +11,7 @@ import {
   FlatList,
   Image,
 } from 'react-native';
-import supabase from '../supabaseClient';
+import { fetchAgriculteurs } from '../DB_Queries/AgriculteurTable'; // Import the fetchAgriculteurs function
 import { useAuthentication } from '../hooks/useAuthentication';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -30,61 +30,12 @@ export default function Home({ navigation }) {
     logout(navigation);
   };
 
-  const fetchProfilePicture = async (cin) => {
-    const profileImagePath = `Agriculteur_PP/${cin}.png`;
-    const defaultImagePath = 'Agriculteur_PP/Default.png'; // Correct path to default image
-
-    try {
-      let { data, error } = await supabase
-        .storage
-        .from('LocAgri')
-        .getPublicUrl(profileImagePath);
-
-      if (error || !data.publicUrl) {
-        console.log(`Profile image not found for ${cin}, fetching default image.`);
-        ({ data, error } = await supabase
-          .storage
-          .from('LocAgri')
-          .getPublicUrl(defaultImagePath));
-
-        if (error || !data.publicUrl) {
-          console.error('Error fetching default image:', error);
-          return 'https://via.placeholder.com/100'; // Return a placeholder URL if default image fails
-        }
-      }
-
-      return data.publicUrl;
-    } catch (error) {
-      console.error('Error fetching image:', error);
-      return 'https://via.placeholder.com/100'; // Return placeholder URL if any error occurs
-    }
-  };
-
   const fetchData = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('Agriculteur')
-        .select('CIN_ID, Nom, Prenom, Sexe, DateNaissance, created_at');
-
-      if (error) {
-        console.error('Error fetching data:', error);
-      } else {
-        const agriculteursWithImages = await Promise.all(data.map(async (agriculteur) => {
-          const imageUrl = await fetchProfilePicture(agriculteur.CIN_ID);
-          agriculteur.imageUrl = imageUrl;
-          return agriculteur;
-        }));
-
-        const sortedData = agriculteursWithImages.sort((a, b) => a.Nom.localeCompare(b.Nom));
-        setAgriculteurs(sortedData);
-        setFilteredAgriculteurs(sortedData);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+    const agriculteursData = await fetchAgriculteurs();
+    setAgriculteurs(agriculteursData);
+    setFilteredAgriculteurs(agriculteursData);
+    setLoading(false);
+    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -128,6 +79,17 @@ export default function Home({ navigation }) {
     <View style={styles.view}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
+          {/* Bubble elements */}
+          <View style={[styles.bubble, styles.topBubble]}></View>
+          <View style={[styles.bubble, styles.bottomBubble]}></View>
+          <View style={[styles.bubble, styles.rightBubble]}></View>
+          <View style={[styles.bubble, styles.leftBubble]}></View>
+          <View style={[styles.bubble, styles.extraBubble1]}></View>
+          <View style={[styles.bubble, styles.extraBubble2]}></View>
+          <View style={[styles.bubble, styles.extraBubble3]}></View>
+          <View style={[styles.bubble, styles.extraBubble4]}></View>
+          <View style={[styles.bubble, styles.extraBubble5]}></View>
+
           <View style={styles.header}>
             <Pressable onPress={handleLogout} style={styles.logoutButton}>
               <AntDesign name="logout" size={25} color="white" />
@@ -186,6 +148,7 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingTop: 50,
     backgroundColor: "#e8f5e9",
+    position: 'relative', // Make positioning relative for bubble positioning
   },
   header: {
     flexDirection: "row",
@@ -269,10 +232,76 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: 'center',
   },
-  listContainer: {
-    flex: 1,
-  },
   row: {
-    justifyContent: "space-between",
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  bubble: {
+    position: 'absolute',
+    backgroundColor: '#388e3c', // Dark green bubble
+    borderRadius: 50, // Circle shape
+  },
+  topBubble: {
+    top: -60,
+    left: 10,
+    width: 120,
+    height: 120,
+    opacity: 0.3,
+  },
+  bottomBubble: {
+    bottom: -60,
+    right: 10,
+    width: 80,
+    height: 80,
+    opacity: 0.3,
+  },
+  rightBubble: {
+    top: '50%',
+    right: -70,
+    width: 100,
+    height: 100,
+    opacity: 0.3,
+  },
+  leftBubble: {
+    top: '50%',
+    left: -70,
+    width: 90,
+    height: 90,
+    opacity: 0.3,
+  },
+  extraBubble1: {
+    top: '10%',
+    left: '15%',
+    width: 60,
+    height: 60,
+    opacity: 0.4,
+  },
+  extraBubble2: {
+    top: '25%',
+    right: '10%',
+    width: 80,
+    height: 80,
+    opacity: 0.3,
+  },
+  extraBubble3: {
+    bottom: '20%',
+    left: '30%',
+    width: 100,
+    height: 100,
+    opacity: 0.5,
+  },
+  extraBubble4: {
+    bottom: '40%',
+    right: '25%',
+    width: 70,
+    height: 70,
+    opacity: 0.4,
+  },
+  extraBubble5: {
+    top: '70%',
+    left: '40%',
+    width: 90,
+    height: 90,
+    opacity: 0.3,
   },
 });
