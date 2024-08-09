@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native';
+import { Table, Row, Rows } from 'react-native-table-component';
 import supabase from '../supabaseClient';
 
 const Detail = ({ route }) => {
@@ -98,6 +99,26 @@ const Detail = ({ route }) => {
     return `${day}/${month}/${year}`;
   };
 
+  // Table headers and data
+  const tableHead = ['Exp', 'Lat/Lon', 'Sup(m2)'];
+  const tableData = exploitations.map((exp, index) => [
+    index + 1,
+    `${exp.Position.Latitude}\n${exp.Position.Longitude}`, // Combine Lat and Lon with line break
+    exp.Superficie,
+  ]);
+
+  const renderRow = (rowData, index) => (
+    <View style={[styles.row, { backgroundColor: index % 2 === 0 ? '#ffffff' : '#a5d6a7' }]}>
+      <Text style={styles.tableText}>{rowData[0]}</Text>
+      <View style={styles.latLonContainer}>
+        <Text style={styles.tableText}>{rowData[1].split('\n')[0]}</Text>
+        <View style={styles.separator} />
+        <Text style={styles.tableText}>{rowData[1].split('\n')[1]}</Text>
+      </View>
+      <Text style={styles.tableText}>{rowData[2]}</Text>
+    </View>
+  );
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.detail}>
@@ -124,23 +145,15 @@ const Detail = ({ route }) => {
             <Text style={styles.sectionTitle}>Exploitation</Text>
             {exploitations.length > 0 ? (
               <ScrollView style={styles.tableContainer}>
-                <View style={styles.table}>
-                  <View style={styles.tableRowHeader}>
-                    <Text style={[styles.tableHeaderCell, styles.tableCell]}></Text>
-                    <Text style={[styles.tableHeaderCell, styles.tableCell]}>Lat</Text>
-                    <Text style={[styles.tableHeaderCell, styles.tableCell]}>Lon</Text>
-                    <Text style={[styles.tableHeaderCell, styles.tableCell]}>Sup(m2)</Text>
-                    
-                  </View>
-                  {exploitations.map((exp, index) => (
-                    <View key={`${exp.Position_ID}-${index}`} style={styles.tableRow}>
-                      <Text style={[styles.tableCell, styles.tableCellBorder]}>{index + 1}</Text>
-                      <Text style={[styles.tableCell, styles.tableCellBorder]}>{exp.Position.Latitude}</Text>
-                      <Text style={styles.tableCell}>{exp.Position.Longitude}</Text>
-                      <Text style={styles.tableCell}>{exp.Superficie}</Text>
-                    </View>
-                  ))}
-                </View>
+                <Table borderStyle={{ borderColor: '#2e7d32', borderWidth: 1 }}>
+                  <Row data={tableHead} style={styles.tableHeader} textStyle={styles.tableHeaderText} />
+                  <Rows
+                    data={tableData}
+                    textStyle={styles.tableText}
+                    renderRow={renderRow}
+                    style={styles.tableBody}
+                  />
+                </Table>
               </ScrollView>
             ) : (
               <Text style={styles.noDataText}>No exploitation found</Text>
@@ -216,38 +229,37 @@ const styles = StyleSheet.create({
     width: '100%',
     maxHeight: 300, // Adjust height as needed
   },
-  table: {
-    width: '100%',
-    borderRadius: 10,
-    overflow: 'hidden', // Ensure rounded corners work
-    borderWidth: 1,
-    borderColor: "#333",
+  tableHeader: {
+    height: 40,
+    backgroundColor: 'transparent',
   },
-  tableRowHeader: {
-    flexDirection: 'row',
-    backgroundColor: "#a5d6a7",
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-  },
-  tableHeaderCell: {
-    flex: 1,
+  tableHeaderText: {
     textAlign: 'center',
     fontWeight: 'bold',
+    color: "#2e7d32",
   },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    paddingVertical: 8,
-    paddingHorizontal: 5,
-  },
-  tableCell: {
-    flex: 1,
+  tableText: {
+    margin: 6,
     textAlign: 'center',
   },
-  tableCellBorder: {
-    borderRightWidth: 1,
-    borderRightColor: '#ddd',
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingVertical: 8,
+  },
+  latLonContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  separator: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#000', 
+    marginVertical: 4, 
   },
   noDataText: {
     fontSize: 18,

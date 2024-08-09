@@ -26,6 +26,9 @@ export default function Home({ navigation }) {
   const [columns] = useState(2);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 
+  // Default profile image URL
+  const defaultImageUrl = 'https://whpyyzpfmysuwipdcypn.supabase.co/storage/v1/object/public/LocAgri/Agriculteur_PP/Default.png';
+
   const handleLogout = () => {
     logout(navigation);
   };
@@ -65,10 +68,11 @@ export default function Home({ navigation }) {
       style={styles.item}
       onPress={() => navigation.navigate('Detail', { agriculteur: item })}
     >
-      <Image 
-        source={{ uri: item.imageUrl }} 
-        style={styles.itemImage} 
+      <Image
+        source={{ uri: item.imageUrl || defaultImageUrl }} // Use default image if imageUrl is not available
+        style={styles.itemImage}
         resizeMode="cover"
+        onError={() => { item.imageUrl = defaultImageUrl; }} // Handle image error
       />
       <Text style={styles.itemText}>{`${item.Nom} ${item.Prenom}`}</Text>
       <Text style={styles.itemSubText}>CIN: {item.CIN_ID}</Text>
@@ -265,43 +269,43 @@ const styles = StyleSheet.create({
   leftBubble: {
     top: '50%',
     left: -70,
-    width: 90,
-    height: 90,
+    width: 100,
+    height: 100,
     opacity: 0.3,
   },
   extraBubble1: {
-    top: '10%',
-    left: '15%',
-    width: 60,
-    height: 60,
-    opacity: 0.4,
+    top: 100,
+    left: 60,
+    width: 150,
+    height: 150,
+    opacity: 0.2,
   },
   extraBubble2: {
-    top: '25%',
-    right: '10%',
-    width: 80,
-    height: 80,
-    opacity: 0.3,
+    bottom: 100,
+    right: 60,
+    width: 150,
+    height: 150,
+    opacity: 0.2,
   },
   extraBubble3: {
-    bottom: '20%',
-    left: '30%',
-    width: 100,
-    height: 100,
-    opacity: 0.5,
-  },
-  extraBubble4: {
-    bottom: '40%',
-    right: '25%',
+    top: 200,
+    right: 10,
     width: 70,
     height: 70,
-    opacity: 0.4,
+    opacity: 0.3,
+  },
+  extraBubble4: {
+    bottom: 200,
+    left: 10,
+    width: 70,
+    height: 70,
+    opacity: 0.3,
   },
   extraBubble5: {
-    top: '70%',
-    left: '40%',
+    top: 300,
+    left: 80,
     width: 90,
     height: 90,
-    opacity: 0.3,
+    opacity: 0.2,
   },
 });

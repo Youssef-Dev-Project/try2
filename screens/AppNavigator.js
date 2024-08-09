@@ -17,7 +17,7 @@ const Tab = createBottomTabNavigator();
 const HomeTabs = () => {
   return (
     <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />} // Use the custom tab bar
+      tabBar={(props) => <CustomTabBar {...props} />} // Use the custom tab bar for all tabs
     >
       <Tab.Screen
         name="Home"
