@@ -107,13 +107,18 @@ const Detail = ({ route }) => {
     exp.Superficie,
   ]);
 
+  
   const renderRow = (rowData, index) => (
     <View style={[styles.row, { backgroundColor: index % 2 === 0 ? '#ffffff' : '#a5d6a7' }]}>
       <Text style={styles.tableText}>{rowData[0]}</Text>
       <View style={styles.latLonContainer}>
-        <Text style={styles.tableText}>{rowData[1].split('\n')[0]}</Text>
+        <TouchableOpacity onPress={() => navigateToMaps(rowData[1].split('\n')[0], rowData[1].split('\n')[1])}>
+          <Text style={styles.tableText}>{rowData[1].split('\n')[0]}</Text>
+        </TouchableOpacity>
         <View style={styles.separator} />
-        <Text style={styles.tableText}>{rowData[1].split('\n')[1]}</Text>
+        <TouchableOpacity onPress={() => navigateToMaps(rowData[1].split('\n')[0], rowData[1].split('\n')[1])}>
+          <Text style={styles.tableText}>{rowData[1].split('\n')[1]}</Text>
+        </TouchableOpacity>
       </View>
       <Text style={styles.tableText}>{rowData[2]}</Text>
     </View>
